@@ -35,9 +35,11 @@ export function TransactionsProvider({ children }: TransactionsProviderProps) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
-    api
-      .get("/transactions")
-      .then((response) => setTransactions(response.data.transactions));
+    const transactionData = localStorage.getItem("transactions");
+    if (transactionData) {
+      const data = JSON.parse(transactionData);
+      setTransactions(data);
+    }
   }, []);
 
   async function createTransaction(transactionInput: TransactionInput) {
@@ -48,6 +50,11 @@ export function TransactionsProvider({ children }: TransactionsProviderProps) {
     const { transaction } = response.data;
 
     setTransactions([...transactions, transaction]);
+
+    localStorage.setItem(
+      "transactions",
+      JSON.stringify([...transactions, transaction])
+    );
   }
 
   return (
